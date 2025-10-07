@@ -51,7 +51,7 @@ function Login() {
           <input type="password" name="password" id="password" onChange={handleChange} />
         </div>
         <div className={styles.inputs}>
-          <button type='submit'>Entrar</button>
+          <button className={styles.button} type='submit'>Entrar</button>
         </div>
       </form>
       <p>Não tem uma conta ? <Link to="/register">Crie uma!</Link></p>

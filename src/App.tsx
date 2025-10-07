@@ -12,6 +12,8 @@ import Register from './pages/Auth/Register';
 import Container from './components/layout/Container';
 import Profile from './pages/User/Profile';
 import AdminArea from './pages/Admin/AdminArea';
+import Room from './pages/Room/Room';
+import RoomInfo from './pages/Room/RoomInfo';
 
 function App() {
   return (
@@ -25,19 +27,29 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
             {/* PRIVATE ROUTES */}
+            <Route path='/admin' element={
+              <RequireAuth routeRole='admin'>
+                < AdminArea />
+              </RequireAuth>
+            } />
             <Route path='/dashboard' element={
               <RequireAuth>
                 <Dashboard />
               </RequireAuth>
             } />
+            <Route path='/room/:id' element={
+              <RequireAuth>
+                <Room/>
+              </RequireAuth>
+            }/>
+            <Route path='/room/:id/info' element={
+              <RequireAuth>
+                <RoomInfo/>
+              </RequireAuth>
+            }/>
             <Route path='/profile' element={
               <RequireAuth>
                 <Profile />
-              </RequireAuth>
-            } />
-            <Route path='/admin' element={
-              <RequireAuth routeRole='admin'>
-                < AdminArea />
               </RequireAuth>
             } />
             {/* 404 */}
