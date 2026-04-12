@@ -1,0 +1,29 @@
+.btn {
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-light);
+  transition: background 0.15s;
+}
+
+.primary     { background: var(--color-primary); }
+.primary:hover { background: var(--color-primary-hover); }
+
+.success     { background: var(--color-success); }
+.success:hover { background: var(--color-success-hover); }
+
+.danger      { background: var(--color-danger); }
+.danger:hover { background: var(--color-danger-hover); }
+
+.info        { background: var(--color-info); }
+.info:hover  { background: var(--color-info-hover); }
+
+.warning     { background: var(--color-warning); }
+
+.secondary   { background: #eee; color: var(--color-text); }
+.secondary:hover { background: var(--color-bg-input); }
+
+.neutral     { background: var(--color-border-dark); }
+.neutral:hover { background: #666; }

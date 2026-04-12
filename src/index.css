@@ -1,3 +1,46 @@
+:root {
+  /* Brand */
+  --color-primary:        #aa920b;
+  --color-primary-hover:  #4b3f02;
+
+  /* Status */
+  --color-success:        #32a852;
+  --color-success-hover:  #072910;
+  --color-danger:         #db211a;
+  --color-danger-hover:   #70110e;
+  --color-info:           #0077dd;
+  --color-info-hover:     #005fa3;
+  --color-warning:        #ff9900;
+
+  /* Neutrals */
+  --color-bg-page:        #f9f9f9;
+  --color-bg-panel:       #f4f4f4;
+  --color-bg-subtle:      #f2f2f2;
+  --color-bg-input:       #ddd;
+  --color-bg-card:        #e0e0e0;
+  --color-bg-white:       #ffffff;
+  --color-bg-dark:        #323;
+  --color-border:         #ccc;
+  --color-border-dark:    #999;
+  --color-border-subtle:  #eee;
+  --color-overlay:        rgba(0, 0, 0, 0.5);
+
+  /* Text */
+  --color-text:           #333;
+  --color-text-dark:      #000;
+  --color-text-light:     #ffffff;
+  --color-text-muted:     #999;
+  --color-text-nav:       #ddd;
+
+  /* Layout */
+  --navbar-height:        60px;
+
+  /* Border radius */
+  --radius-sm:            4px;
+  --radius-md:            6px;
+  --radius-lg:            8px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -15,6 +58,6 @@ body,
 body {
   display: flex;
   flex-direction: column;
-  background-color: #f9f9f9; /* opcional: cor de fundo clara e neutra */
-  color: #333; /* opcional: cor de texto padrão */
+  background-color: var(--color-bg-page);
+  color: var(--color-text);
 }

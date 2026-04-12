@@ -8,6 +8,8 @@ import { IoMdAdd } from "react-icons/io";
 import { FaCog, FaDoorOpen } from "react-icons/fa";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { ErrorBoundary } from "../../components/routes/ErrorBoundary";
+import { Modal, modalStyles } from "../../components/ui/Modal";
+import { Button } from "../../components/ui/Button";
 
 interface Room {
   _id: string;
@@ -130,37 +132,31 @@ export default function Dashboard() {
       </ErrorBoundary>
       {/* Find Room Modal */}
       {showFindRoomModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2>Procurar sala</h2>
-            <form onSubmit={handleFindRoom}>
-              <label>Digite o código da sala:</label>
-              <input type="text" required name='roomCode' onChange={handleRoomCodeChange}/>
-
-              <div className={styles.modalActions}>
-                <button type="button" className={styles.modalCancelButton} onClick={() => setShowFindRoomModal(false)}>Cancelar</button>
-                <button type="submit" className={styles.modalButton}>Buscar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <Modal onClose={() => setShowFindRoomModal(false)}>
+          <h2>Procurar sala</h2>
+          <form onSubmit={handleFindRoom}>
+            <label>Digite o código da sala:</label>
+            <input type="text" required name='roomCode' onChange={handleRoomCodeChange}/>
+            <div className={modalStyles.actions}>
+              <Button variant="danger" type="button" onClick={() => setShowFindRoomModal(false)}>Cancelar</Button>
+              <Button variant="success" type="submit">Buscar</Button>
+            </div>
+          </form>
+        </Modal>
       )}
       {/* Create Room Modal */}
       {showCreateRoomModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2>Criar sala</h2>
-            <form onSubmit={handleCreateRoom}>
-              <label>Nome da sala:</label>
-              <input type="text" required name='name' onChange={handleRoomChange}/>
-
-              <div className={styles.modalActions}>
-                <button type="button" className={styles.modalCancelButton} onClick={() => setShowCreateRoomModal(false)}>Cancelar</button>
-                <button type="submit" className={styles.modalButton}>Criar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <Modal onClose={() => setShowCreateRoomModal(false)}>
+          <h2>Criar sala</h2>
+          <form onSubmit={handleCreateRoom}>
+            <label>Nome da sala:</label>
+            <input type="text" required name='name' onChange={handleRoomChange}/>
+            <div className={modalStyles.actions}>
+              <Button variant="danger" type="button" onClick={() => setShowCreateRoomModal(false)}>Cancelar</Button>
+              <Button variant="success" type="submit">Criar</Button>
+            </div>
+          </form>
+        </Modal>
       )}
     </div>
   )

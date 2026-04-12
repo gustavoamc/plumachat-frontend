@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './Grid.module.css'
 import api from '../../../utils/api';
 import { FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa';
+import { Modal, modalStyles } from '../../../components/ui/Modal';
+import { Button } from '../../../components/ui/Button';
 
 interface User {
   _id: string;
@@ -208,36 +210,36 @@ function UsersList() {
         </div>
 
         <div className={styles.actionsButtons}>
-          {selectedUser.isBanned ? 
-            <button className={styles.unbanButton} onClick={() => handleUnban(selectedUser._id)}>Desbanir</button>
+          {selectedUser.isBanned ?
+            <Button variant="success" onClick={() => handleUnban(selectedUser._id)}>Desbanir</Button>
             :
-            <button className={styles.banButton} onClick={() => setOpenBanModal(true)}>Banir</button>
+            <Button variant="danger" onClick={() => setOpenBanModal(true)}>Banir</Button>
           }
         </div>
       </div>
 
       {/* MODAL */}
       {openBanModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h3>Banir Usuário</h3>
-            <p>Motivo do banimento:</p>
-            <input
-              type="text"
-              placeholder="Ex.: Quebrou as regras de conduta"
-              value={banReason}
-              onChange={(e) => setBanReason(e.target.value)}
-            />
-            <p>Banir até:</p>
-            <input
-              type="date"
-              value={banUntil}
-              onChange={(e) => setBanUntil(e.target.value)}
-            />
-            <button className={styles.banButton} onClick={() => handleBan(selectedUser._id)}>Confirmar Ban</button>
-            <button className={styles.unbanButton} onClick={() => setOpenBanModal(false)}>Cancelar</button>
+        <Modal onClose={() => setOpenBanModal(false)}>
+          <h3>Banir Usuário</h3>
+          <p>Motivo do banimento:</p>
+          <input
+            type="text"
+            placeholder="Ex.: Quebrou as regras de conduta"
+            value={banReason}
+            onChange={(e) => setBanReason(e.target.value)}
+          />
+          <p>Banir até:</p>
+          <input
+            type="date"
+            value={banUntil}
+            onChange={(e) => setBanUntil(e.target.value)}
+          />
+          <div className={modalStyles.actions}>
+            <Button variant="neutral" onClick={() => setOpenBanModal(false)}>Cancelar</Button>
+            <Button variant="danger" onClick={() => handleBan(selectedUser._id)}>Confirmar Ban</Button>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )
