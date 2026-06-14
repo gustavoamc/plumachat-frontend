@@ -12,6 +12,17 @@
     align-items: center;
 }
 
+.headerActions {
+    display: flex;
+    gap: 8px;
+}
+
+.canvasContainer {
+    flex: 1;
+    overflow: auto;
+    padding-right: 4px;
+}
+
 .removedDiv {
     display: flex;
     flex-direction: column;

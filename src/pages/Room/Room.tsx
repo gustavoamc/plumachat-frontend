@@ -8,7 +8,8 @@ import { ErrorBoundary } from '../../components/routes/ErrorBoundary';
 import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { RoomInfoPanel } from './RoomInfoPanel';
-import { FaArrowLeft } from "react-icons/fa";
+import { RoomCanvas } from './RoomCanvas';
+import { FaArrowLeft, FaPaintBrush, FaComments } from "react-icons/fa";
 
 interface RoomMeta {
   _id: string;
@@ -42,6 +43,7 @@ function Room() {
   const [input, setInput] = useState('');
   const [removed, setRemoved] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showCanvas, setShowCanvas] = useState(false);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [showSystemMessages, setShowSystemMessages] = useState(
     () => localStorage.getItem('showSystemMessages') !== 'false'
@@ -212,12 +214,26 @@ function Room() {
             <FaArrowLeft /> Desconectar
           </Button>
           <h1>{room?.name ?? 'Carregando...'}</h1>
-          <Button variant="secondary" onClick={() => setShowInfoModal(true)}>
-            Informações da sala
-          </Button>
+          <div className={styles.headerActions}>
+            <Button variant="info" onClick={() => setShowCanvas(prev => !prev)}>
+              {showCanvas ? <><FaComments /> Voltar ao chat</> : <><FaPaintBrush /> Quadro</>}
+            </Button>
+            <Button variant="secondary" onClick={() => setShowInfoModal(true)}>
+              Informações da sala
+            </Button>
+          </div>
         </div>
 
-        <div className={styles.messagesContainer}>
+        {showCanvas && id && (
+          <div className={styles.canvasContainer}>
+            <RoomCanvas roomId={id} />
+          </div>
+        )}
+
+        <div
+          className={styles.messagesContainer}
+          style={showCanvas ? { display: 'none' } : undefined}
+        >
           {visibleMessages.map(msg => {
             if (msg.system) {
               return (
@@ -245,7 +261,10 @@ function Room() {
           <div ref={messagesEndRef} />
         </div>
 
-        <div className={styles.inputArea}>
+        <div
+          className={styles.inputArea}
+          style={showCanvas ? { display: 'none' } : undefined}
+        >
           {commandSuggestions.length > 0 && (
             <div className={styles.commandList}>
               {commandSuggestions.map(c => (
