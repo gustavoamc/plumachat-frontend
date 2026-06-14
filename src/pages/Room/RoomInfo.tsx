@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../utils/api';
 import styles from './RoomInfo.module.css'
@@ -20,6 +20,7 @@ interface Room {
 
 function RoomInfo() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [showEditRoomModal, setShowEditRoomModal] = useState(false);
   const [isOnwer, setIsOwner] = useState(false);
@@ -42,7 +43,8 @@ function RoomInfo() {
         setIsOwner(user!._id === res.data.owner._id);
       })
       .catch(error => {
-        alert('Erro ao buscar sala: ' + error.response.data.message);
+        alert('Erro ao buscar sala: ' + error.response?.data?.message);
+        navigate(-1);
       });
   },[user])
 
@@ -68,7 +70,7 @@ function RoomInfo() {
 
   const handleEditRoom = (e: any) => {
     e.preventDefault();
-    
+
     api.patch(`/room/${id}`, { name: room.name })
       .then(res => {
         setRoom(res.data.room);
@@ -77,6 +79,29 @@ function RoomInfo() {
       .catch(error => {
         alert('Erro ao editar sala: ' + error.response.data.message);
       })
+  }
+
+  const handleLeaveRoom = () => {
+    api.post(`/room/leave/${id}`)
+      .then(() => {
+        navigate('/dashboard');
+      })
+      .catch(error => {
+        alert('Erro ao saída da sala: ' + error.response?.data?.message);
+      });
+  }
+
+  const handleDeleteRoom = () => {
+    if (!window.confirm('Tem certeza que deseja deletar esta sala? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    api.delete(`/room/${id}`)
+      .then(() => {
+        navigate('/dashboard');
+      })
+      .catch(error => {
+        alert('Erro ao deletar sala: ' + error.response?.data?.message);
+      });
   }
   
   return (
@@ -110,13 +135,13 @@ function RoomInfo() {
           <div className={styles.rightColumn}>
             <h1>Opções da sala:</h1>
             <div className={styles.roomOptionsDiv}>
-              <Button variant="danger"><IoMdExit /> Sair da sala</Button>
+              <Button variant="danger" onClick={handleLeaveRoom}><IoMdExit /> Sair da sala</Button>
               {isOnwer && (
                 <>
                   <Button variant="warning" onClick={() => setShowEditRoomModal(true)}>
                     <FaEdit /> Editar sala
                   </Button>
-                  <Button variant="danger"><FaTrashAlt /> Deletar sala</Button>
+                  <Button variant="danger" onClick={handleDeleteRoom}><FaTrashAlt /> Deletar sala</Button>
                 </>
               )}
             </div>

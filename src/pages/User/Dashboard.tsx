@@ -21,7 +21,7 @@ interface Room {
 export default function Dashboard() {
   const { user } = useAuth();
   const [userRooms, setUserRooms] = useState<Room[]>([]);
-  const [roomCode, setRoomCode] = useState<Room[]>([]);
+  const [roomCode, setRoomCode] = useState("");
   const [showFindRoomModal, setShowFindRoomModal] = useState(false);
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [room, setRoom] = useState({name: '', isPrivate: true});
@@ -74,7 +74,7 @@ export default function Dashboard() {
     api.post(`/room/join/${roomCode}`)
       .then(res => {
         setShowFindRoomModal(false);
-        setUserRooms([...userRooms, res.data]);
+        setUserRooms([...userRooms, res.data.room]);
       })
       .catch(error => {
         console.error("Erro ao procurar sala:", error);
