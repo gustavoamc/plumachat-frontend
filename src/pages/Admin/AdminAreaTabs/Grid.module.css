@@ -32,15 +32,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #190f0f;
-  border: none;
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border);
   padding: 0.5rem;
   cursor: pointer;
   border-radius: var(--radius-sm);
 }
 
 .sortButton:hover {
-  background: var(--color-bg-input);
+  background: var(--color-bg-card);
 }
 
 .userList {

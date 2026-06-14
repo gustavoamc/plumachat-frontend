@@ -45,5 +45,5 @@
 
 .link:hover {
   color: var(--color-text-light);
-  background-color: var(--color-primary-hover);
+  background-color: var(--color-navbar-hover);
 }
