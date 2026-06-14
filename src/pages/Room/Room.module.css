@@ -73,7 +73,8 @@
 
 .messageTimestamp {
     font-size: 0.7rem;
-    color: var(--color-text-muted);
+    color: inherit;
+    opacity: 0.75;
     align-self: flex-end;
 }
 
