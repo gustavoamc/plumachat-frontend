@@ -4,6 +4,8 @@ import api from '../../utils/api';
 import styles from './Profile.module.css';
 import { useState } from 'react';
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { Modal, modalStyles } from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
 
 function Profile() { //TODO: move modals to a modal component
   const { user, login, logout } = useAuth(); //using login here because it only updates the user state (context and localstorage).
@@ -91,55 +93,51 @@ function Profile() { //TODO: move modals to a modal component
           <p><strong>Email:</strong> {dataVisible ? user?.email : '**************'}</p>
         </div>
 
-        <button className={styles.button} onClick={() => setShowDataModal(true)}>Editar informações</button>
-        <button className={styles.button} onClick={() => setShowPasswordModal(true)}>Trocar Senha</button>
+        <Button variant="primary" onClick={() => setShowDataModal(true)}>Editar informações</Button>
+        <Button variant="primary" onClick={() => setShowPasswordModal(true)}>Trocar Senha</Button>
         <br /><br />
-        <button className={`${styles.button} ${styles.logoutButton}`} onClick={logout}>Sair</button>
+        <Button variant="danger" onClick={logout}>Sair</Button>
       </div>
 
       {/* Password Modal */}
       {showPasswordModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2>Trocar Senha</h2>
-            <form onSubmit={handlePasswordSubmit}>
-              <label>Senha atual</label>
-              <input type="password" required name='currentPassword' onChange={handlePasswordsChange}/>
+        <Modal onClose={() => setShowPasswordModal(false)}>
+          <h2>Trocar Senha</h2>
+          <form onSubmit={handlePasswordSubmit}>
+            <label>Senha atual</label>
+            <input type="password" required name='currentPassword' onChange={handlePasswordsChange}/>
 
-              <label>Nova senha</label>
-              <input type="password" required name='newPassword' onChange={handlePasswordsChange}/>
+            <label>Nova senha</label>
+            <input type="password" required name='newPassword' onChange={handlePasswordsChange}/>
 
-              <label>Confirmar nova senha</label>
-              <input type="password" required name='confirmPassword' onChange={handlePasswordsChange}/>
+            <label>Confirmar nova senha</label>
+            <input type="password" required name='confirmPassword' onChange={handlePasswordsChange}/>
 
-              <div className={styles.modalActions}>
-                <button type="button" className={styles.cancelButton} onClick={() => setShowPasswordModal(false)}>Cancelar</button>
-                <button type="submit" className={styles.button}>Confirmar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <div className={modalStyles.actions}>
+              <Button variant="neutral" type="button" onClick={() => setShowPasswordModal(false)}>Cancelar</Button>
+              <Button variant="primary" type="submit">Confirmar</Button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {/* Data Modal */}
       {showDataModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2>Editar informações</h2>
-            <form onSubmit={handleDataSubmit}>
-              <label>Username</label>
-              <input type="text" required name='username' onChange={handleDataChange}/>
+        <Modal onClose={() => setShowDataModal(false)}>
+          <h2>Editar informações</h2>
+          <form onSubmit={handleDataSubmit}>
+            <label>Username</label>
+            <input type="text" required name='username' onChange={handleDataChange}/>
 
-              <label>Email</label>
-              <input type="text" required name='email' onChange={handleDataChange}/>
+            <label>Email</label>
+            <input type="text" required name='email' onChange={handleDataChange}/>
 
-              <div className={styles.modalActions}>
-                <button type="button" className={styles.cancelButton} onClick={() => setShowDataModal(false)}>Cancelar</button>
-                <button type="submit" className={styles.button}>Confirmar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+            <div className={modalStyles.actions}>
+              <Button variant="neutral" type="button" onClick={() => setShowDataModal(false)}>Cancelar</Button>
+              <Button variant="primary" type="submit">Confirmar</Button>
+            </div>
+          </form>
+        </Modal>
       )}
     </div>
   );

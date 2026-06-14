@@ -14,7 +14,7 @@
   padding: 0.5rem 1rem;
   font-size: 1rem;
   border-radius: 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-border);
 }
 
 .orderButtonsDiv {
@@ -29,18 +29,18 @@
 }
 
 .sortButton {
-  display: flex;           
-  align-items: center;      /* Centers vertically */
-  justify-content: center;  /* Centers horizontally */
-  background: #190f0f;
-  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border);
   padding: 0.5rem;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .sortButton:hover {
-  background: #ddd;
+  background: var(--color-bg-card);
 }
 
 .userList {
@@ -60,28 +60,6 @@
   background-color: #acc;
 }
 
-.promoteButton,
-.demoteButton {
-  background: #0077cc;
-  color: #fff;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.demoteButton {
-  background: #aa0000;
-}
-
-.promoteButton:hover {
-  background: #005fa3;
-}
-
-.demoteButton:hover {
-  background: #880000;
-}
 
 .boldSpan {
   font-weight: bold;
@@ -103,7 +81,7 @@
 }
 
 .leftColumn {
-  border-right: 2px solid #ddd;
+  border-right: 2px solid var(--color-bg-input);
   overflow-y: auto;
   padding: 1rem;
 }
@@ -113,7 +91,7 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem;
-  background-color: #f9f9f9; /* leve contraste */
+  background-color: var(--color-bg-page);
 }
 
 .rightColumnHeader {
@@ -121,8 +99,8 @@
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
-  border: 1px solid #999;
-  border-radius: 4px;
+  border: 1px solid var(--color-border-dark);
+  border-radius: var(--radius-sm);
   padding: 1rem;
 }
 
@@ -130,74 +108,5 @@
   display: flex;
   gap: 1rem;
   margin-top: auto;
-}
-
-.banButton,
-.unbanButton {
-  padding: 0.5rem 1rem;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 4px;
-}
-
-.banButton {
-  background-color: #c0392b;
-  color: #fff;
-}
-
-.banButton:hover {
-  background-color: #922b21;
-}
-
-.unbanButton {
-  background-color: #27ae60;
-  color: #fff;
-}
-
-.unbanButton:hover {
-  background-color: #1e8449;
-}
-
-/* === MODAL === */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modalContent {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 400px;
-  width: 100%;
-}
-
-.modalContent h3 {
-  margin-bottom: 1rem;
-}
-
-.modalContent input {
-  display: block;
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-}
-
-.modalContent button {
-  color: #fff;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  margin: 2px;
-  font-size: 18px;
-  cursor: pointer;
-  border-radius: 4px;
 }
 

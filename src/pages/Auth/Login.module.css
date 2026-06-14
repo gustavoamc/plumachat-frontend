@@ -24,7 +24,7 @@
   border-radius: 0.5rem;
   border: 1px solid #555;
   margin-bottom: 1rem;
-  background-color: #ddd;
+  background-color: var(--color-bg-input);
 }
 
 .button {
@@ -33,7 +33,7 @@
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   border: none;
-  background-color: #aa920b;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
   cursor: pointer;
 }

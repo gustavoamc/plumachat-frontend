@@ -16,11 +16,11 @@
 .headerButtons button {
   all: unset;
   background-color: #f9d835;
-  color: #000;
+  color: var(--color-text-dark);
   padding: 10px 16px;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-weight: bold;
 }
 
@@ -31,7 +31,7 @@
 
 .noChats {
   font-style: italic;
-  color: gray;
+  color: var(--color-text-muted);
   margin: 16px 8px;
   text-align: center;
 }
@@ -43,7 +43,7 @@
 
 .roomRow {
   padding: 12px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--color-border);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -69,11 +69,11 @@
 .joinButton {
   all: unset;
   background-color: #007900;
-  color: white;
+  color: var(--color-text-light);
   padding: 10px 16px;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   font-weight: bold;
   align-items: center;
@@ -91,12 +91,12 @@
 }
 
 .dropbtn {
-  background-color: #0077dd;
-  color: white;
+  background-color: var(--color-info);
+  color: var(--color-text-light);
   padding: 10px 16px;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   font-weight: bold;
 }
@@ -104,20 +104,20 @@
 .dropdownContent {
   display: none;
   position: absolute;
-  top: 100%;          
-  right: 0;           
-  background-color: white;
+  top: 100%;
+  right: 0;
+  background-color: var(--color-bg-white);
   min-width: 130px;
-  max-height: 250px;  /* prevents big scrollbar */
-  overflow-y: auto;   /* creates scrollbar only if size limit is passed */
+  max-height: 250px;
+  overflow-y: auto;
   box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-  border-radius: 4px;
-  z-index: 1000;      /* assures it will stay on top */
+  border-radius: var(--radius-sm);
+  z-index: 1000;
   padding: 4px;
 }
 
 .dropdownItem {
-  color: black;
+  color: var(--color-text-dark);
   padding: 10px;
   text-decoration: none;
   display: block;
@@ -139,72 +139,7 @@
 }
 
 .dropdown:hover .dropbtn {
-  background-color: #005fa3;
+  background-color: var(--color-info-hover);
   transition: 0.2s;
 }
 
-/* Modal */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modalContent {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.modalContent label {
-  font-weight: bold;
-}
-
-.modalContent input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%;
-}
-
-.modalActions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
-}
-
-.modalCancelButton, .modalButton {
-  all: unset;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: bold;
-  text-align: center;
-}
-
-.modalCancelButton {
-  background-color: #db211a;
-}
-.modalCancelButton:hover {
-  background-color: #70110e;
-}
-
-.modalButton {
-  background-color: #32a852;
-}
-.modalButton:hover {
-  background-color: #072910;
-}

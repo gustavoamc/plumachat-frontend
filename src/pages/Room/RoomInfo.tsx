@@ -6,6 +6,8 @@ import styles from './RoomInfo.module.css'
 import { ErrorBoundary } from '../../components/routes/ErrorBoundary';
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { IoIosRemoveCircle, IoMdExit } from "react-icons/io";
+import { Modal, modalStyles } from '../../components/ui/Modal';
+import { Button } from '../../components/ui/Button';
 
 interface Room {
   _id: string;
@@ -98,7 +100,7 @@ function RoomInfo() {
                 <div key={participant._id} className={styles.participantDiv}>
                   <p>{participant.username} {user!._id == participant._id ? <strong>(Você)</strong>: ''}</p>
                   {isOnwer && (
-                    <button onClick={() => removeParticipant(participant._id)}><IoIosRemoveCircle /> Remover da sala</button>
+                    <Button variant="danger" onClick={() => removeParticipant(participant._id)}><IoIosRemoveCircle /> Remover da sala</Button>
                   )}
                 </div>
               ))}
@@ -108,15 +110,13 @@ function RoomInfo() {
           <div className={styles.rightColumn}>
             <h1>Opções da sala:</h1>
             <div className={styles.roomOptionsDiv}>
-              <button className={styles.redButton}><IoMdExit /> Sair da sala</button>
+              <Button variant="danger"><IoMdExit /> Sair da sala</Button>
               {isOnwer && (
                 <>
-                  <button className={styles.orangeButton}
-                    onClick={() => setShowEditRoomModal(true)}
-                  >
+                  <Button variant="warning" onClick={() => setShowEditRoomModal(true)}>
                     <FaEdit /> Editar sala
-                  </button>
-                  <button className={styles.redButton}><FaTrashAlt /> Deletar sala</button>
+                  </Button>
+                  <Button variant="danger"><FaTrashAlt /> Deletar sala</Button>
                 </>
               )}
             </div>
@@ -124,20 +124,17 @@ function RoomInfo() {
       </div>
       {/* Edit Room Modal */}
       {showEditRoomModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2>Editar sala</h2>
-            <form onSubmit={handleEditRoom}>
-              <label>Novo nome da sala:</label>
-              <input type="text" required name='roomName' onChange={handleRoomChange}/>
-
-              <div className={styles.modalActions}>
-                <button type="button" className={styles.modalCancelButton} onClick={() => setShowEditRoomModal(false)}>Cancelar</button>
-                <button type="submit" className={styles.modalButton}>Alterar</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <Modal onClose={() => setShowEditRoomModal(false)}>
+          <h2>Editar sala</h2>
+          <form onSubmit={handleEditRoom}>
+            <label>Novo nome da sala:</label>
+            <input type="text" required name='roomName' onChange={handleRoomChange}/>
+            <div className={modalStyles.actions}>
+              <Button variant="danger" type="button" onClick={() => setShowEditRoomModal(false)}>Cancelar</Button>
+              <Button variant="success" type="submit">Alterar</Button>
+            </div>
+          </form>
+        </Modal>
       )}
     </ErrorBoundary>
   )

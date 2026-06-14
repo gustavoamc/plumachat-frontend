@@ -3,13 +3,13 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: stretch;
-  height: calc(100vh - 60px);
+  height: calc(100vh - var(--navbar-height));
   gap: 1rem;
 }
 
 .mainColumnDiv {
   width: 40vw;
-  height: calc(100vh - 60px);
+  height: calc(100vh - var(--navbar-height));
   position: fixed;
   left: 30vw;
   display: flex;
@@ -20,7 +20,7 @@
 
 .lateralColumnDiv {
   width: 30vw;
-  height: calc(100vh - 60px);
+  height: calc(100vh - var(--navbar-height));
   position: fixed;
   top: 0;
   display: flex;
@@ -31,7 +31,7 @@
 }
 
 .mainColumnDiv, .lateralColumnDiv {
-  margin-top: 60px;
+  margin-top: var(--navbar-height);
 }
 
 .left {
@@ -59,15 +59,15 @@
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   border: none;
-  background-color: #aa920b;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
   cursor: pointer;
   width: 100%;
   text-decoration: unset;
 }
 
 .button:hover {
-  background-color: #4b3f02;
+  background-color: var(--color-primary-hover);
   transition: ease-in-out 0.2s;
 }
 

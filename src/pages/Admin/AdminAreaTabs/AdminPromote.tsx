@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import api from "../../../utils/api"
 import styles from "./Grid.module.css";
 import { FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
+import { Button } from '../../../components/ui/Button';
 
 interface User {
   _id: string;
@@ -168,13 +169,13 @@ export default function AdminPromote() {
               <p><span className={styles.boldSpan}>Conta criada em: </span>{formatDate(user.createdAt)}</p>
             </div>
             {user.role === "user" ? (
-              <button className={styles.promoteButton} onClick={() => handlePromote(user._id)}>
+              <Button variant="info" onClick={() => handlePromote(user._id)}>
                 🔼 Promover a Admin
-              </button>
+              </Button>
             ) : (
-              <button className={styles.demoteButton} onClick={() => handleDemote(user._id)}>
+              <Button variant="danger" onClick={() => handleDemote(user._id)}>
                 🔽 Rebaixar para User
-              </button>
+              </Button>
             )}
           </li>
         ))}
