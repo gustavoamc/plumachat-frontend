@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [showFindRoomModal, setShowFindRoomModal] = useState(false);
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [room, setRoom] = useState({name: '', isPrivate: true});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     api.get(`/room/`)
@@ -57,6 +58,33 @@ export default function Dashboard() {
   const handleRoomChange = (e: any) => {
     const { name, value } = e.target;
     setRoom(prevState => ({ ...prevState, [name]: value }));
+  }
+
+  const handleCopyCode = async (roomId: string) => {
+    try {
+      await navigator.clipboard.writeText(roomId);
+    } catch {
+      // Fallback for non-secure contexts where the Clipboard API is unavailable
+      const textarea = document.createElement('textarea');
+      textarea.value = roomId;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    setCopiedId(roomId);
+    setTimeout(() => setCopiedId(null), 1200);
+  }
+
+  const handlePasteCode = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setRoomCode(text.trim());
+    } catch {
+      alert('Não foi possível ler a área de transferência. Cole manualmente.');
+    }
   }
 
   const handleRoomCodeChange = (e: any) => {
@@ -112,8 +140,11 @@ export default function Dashboard() {
                         <div className={styles.dropdownContent}>
                           { room.owner === user!._id && 
                             <div>
-                              <button onClick={() => navigator.clipboard.writeText(room._id)} className={styles.dropdownItem}>
-                                Copiar código da sala
+                              <button
+                                onClick={() => handleCopyCode(room._id)}
+                                className={`${styles.dropdownItem} ${copiedId === room._id ? styles.copied : ''}`}
+                              >
+                                {copiedId === room._id ? 'Código copiado!' : 'Copiar código da sala'}
                               </button>
                               <hr/>
                             </div>
@@ -136,7 +167,10 @@ export default function Dashboard() {
           <h2>Procurar sala</h2>
           <form onSubmit={handleFindRoom}>
             <label>Digite o código da sala:</label>
-            <input type="text" required name='roomCode' onChange={handleRoomCodeChange}/>
+            <div className={styles.codeInputRow}>
+              <input type="text" required name='roomCode' value={roomCode} onChange={handleRoomCodeChange}/>
+              <Button variant="secondary" type="button" onClick={handlePasteCode}>Colar código</Button>
+            </div>
             <div className={modalStyles.actions}>
               <Button variant="danger" type="button" onClick={() => setShowFindRoomModal(false)}>Cancelar</Button>
               <Button variant="success" type="submit">Buscar</Button>

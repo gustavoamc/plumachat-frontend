@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import api from '../../utils/api';
 import styles from './RoomInfo.module.css'
 import { ErrorBoundary } from '../../components/routes/ErrorBoundary';
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { IoIosRemoveCircle, IoMdExit } from "react-icons/io";
 import { Modal, modalStyles } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
@@ -106,20 +106,23 @@ function RoomInfo() {
   
   return (
     <ErrorBoundary>
+      <Button variant="neutral" onClick={() => navigate(-1)}>
+        <FaArrowLeft /> Voltar
+      </Button>
       <div className={styles.mainDiv}>
-          <div className={styles.leftColumn}>
-            <h1>Informações da sala</h1>
+          <div className={styles.block}>
+            <h2>Informações da sala</h2>
             <div className={styles.roomInfoDiv}>
               <p><strong>Nome:</strong> {room.name}</p>
               <p><strong>Dono:</strong> {room.owner.username}</p>
               <p><strong>Privacidade:</strong> {room.isPrivate ? 'Privada' : 'Pública'}</p>
               <p><strong>Criada em:</strong> {new Date(room.createdAt).toLocaleDateString()}</p>
             </div>
+          </div>
 
-            <div>
-              <h1>Participantes da sala</h1>
-              <p>total: {room.participants.length}</p>
-            </div>
+          <div className={styles.block}>
+            <h2>Participantes da sala</h2>
+            <p>total: {room.participants.length}</p>
             <div className={styles.participantsList}>
               {room.participants.map(participant => (
                 <div key={participant._id} className={styles.participantDiv}>
@@ -132,8 +135,8 @@ function RoomInfo() {
             </div>
           </div>
 
-          <div className={styles.rightColumn}>
-            <h1>Opções da sala:</h1>
+          <div className={styles.block}>
+            <h2>Opções da sala</h2>
             <div className={styles.roomOptionsDiv}>
               <Button variant="danger" onClick={handleLeaveRoom}><IoMdExit /> Sair da sala</Button>
               {isOnwer && (

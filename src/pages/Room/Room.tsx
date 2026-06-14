@@ -12,6 +12,7 @@ interface RoomMeta {
   _id: string;
   name: string;
   isPrivate: boolean;
+  participants: { _id: string; username: string }[];
 }
 
 interface ChatMessage {
@@ -20,6 +21,8 @@ interface ChatMessage {
   username: string;
   content: string;
   timestamp: string;
+  system?: boolean;
+  action?: string;
 }
 
 function Room() {
@@ -30,6 +33,7 @@ function Room() {
   const [room, setRoom] = useState<RoomMeta | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
+  const [removed, setRemoved] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load room metadata + message history
@@ -70,6 +74,21 @@ function Room() {
       setMessages(prev => [...prev, msg]);
     });
 
+    socket.on('system_message', (msg: ChatMessage) => {
+      setMessages(prev => [...prev, msg]);
+    });
+
+    socket.on('participant_removed', ({ userId }: { userId: string }) => {
+      if (userId === user?._id) {
+        setRemoved(true);
+        return;
+      }
+      // Drop the removed user from the local list so their messages are flagged
+      setRoom(prev =>
+        prev ? { ...prev, participants: prev.participants.filter(p => p._id !== userId) } : prev
+      );
+    });
+
     socket.on('error', (err: { message: string }) => {
       console.error('Socket error:', err.message);
     });
@@ -77,6 +96,8 @@ function Room() {
     return () => {
       socket.emit('leave_room', id);
       socket.off('receive_message');
+      socket.off('system_message');
+      socket.off('participant_removed');
       socket.off('error');
       disconnectSocket();
     };
@@ -87,6 +108,15 @@ function Room() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Formats a timestamp as "DD/MM/YY HH:MM:SS"
+  const formatSystemTime = (ts: string) => {
+    const d = new Date(ts);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const date = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${pad(d.getFullYear() % 100)}`;
+    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    return `${date} ${time}`;
+  };
+
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || !id) return;
@@ -94,6 +124,20 @@ function Room() {
     getSocket().emit('send_message', { roomId: id, content: input.trim() });
     setInput('');
   };
+
+  if (removed) {
+    return (
+      <ErrorBoundary>
+        <div className={styles.removedDiv}>
+          <h1>Você foi removido desta sala.</h1>
+          <p>O dono da sala removeu seu acesso.</p>
+          <Button variant="primary" onClick={() => navigate('/dashboard')}>
+            <FaArrowLeft /> Voltar para a Dashboard
+          </Button>
+        </div>
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -109,18 +153,30 @@ function Room() {
         </div>
 
         <div className={styles.messagesContainer}>
-          {messages.map(msg => (
+          {messages.map(msg => {
+            if (msg.system) {
+              return (
+                <div key={msg._id} className={styles.systemMessage}>
+                  {formatSystemTime(msg.timestamp)} - {msg.username} {msg.action}
+                </div>
+              );
+            }
+            const isMember = !room || room.participants.some(p => p._id === msg.userId);
+            return (
             <div
               key={msg._id}
               className={`${styles.messageRow} ${msg.userId === user!._id ? styles.ownMessage : ''}`}
             >
-              <span className={styles.messageAuthor}>{msg.username}</span>
+              <span className={styles.messageAuthor}>
+                {msg.username}{!isMember && ' - (saiu/removido)'}
+              </span>
               <p className={styles.messageContent}>{msg.content}</p>
               <span className={styles.messageTimestamp}>
                 {new Date(msg.timestamp).toLocaleTimeString()}
               </span>
             </div>
-          ))}
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
 
