@@ -26,6 +26,12 @@ interface ChatMessage {
   system?: boolean;
 }
 
+// Available chat commands, shown as hints when the input starts with "/"
+const COMMANDS = [
+  { name: '/r', usage: '/r 2d6', description: 'Rola dados — ex: /r 3d10+2, /r 2d8+6 ataque' },
+  { name: '/sussurro', usage: '/sussurro <usuário> <msg>', description: 'Envia uma mensagem privada a um usuário' },
+];
+
 function Room() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -111,7 +117,15 @@ function Room() {
     });
 
     socket.on('error', (err: { message: string }) => {
-      console.error('Socket error:', err.message);
+      // Show server feedback (e.g. invalid command) only to this client
+      setMessages(prev => [...prev, {
+        _id: `local-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        system: true,
+        content: err.message,
+        timestamp: new Date().toISOString(),
+        userId: '',
+        username: '',
+      }]);
     });
 
     return () => {
@@ -141,9 +155,11 @@ function Room() {
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || !id) return;
+    const text = input.trim();
+    if (!text || !id) return;
 
-    getSocket().emit('send_message', { roomId: id, content: input.trim() });
+    // Slash commands (e.g. "/r 2d6") are parsed and rolled server-side
+    getSocket().emit('send_message', { roomId: id, content: text });
     setInput('');
   };
 
@@ -158,6 +174,21 @@ function Room() {
   const visibleMessages = showSystemMessages
     ? messages
     : messages.filter(m => !m.system);
+
+  const commandQuery = input.startsWith('/')
+    ? input.slice(1).split(/\s+/)[0].toLowerCase()
+    : null;
+  const commandSuggestions = commandQuery !== null
+    ? COMMANDS.filter(c => c.name.slice(1).startsWith(commandQuery))
+    : [];
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Tab completes to the top matching command while still typing its name
+    if (e.key === 'Tab' && commandSuggestions.length > 0 && !input.includes(' ')) {
+      e.preventDefault();
+      setInput(commandSuggestions[0].name + ' ');
+    }
+  };
 
   if (removed) {
     return (
@@ -214,15 +245,33 @@ function Room() {
           <div ref={messagesEndRef} />
         </div>
 
-        <form className={styles.inputForm} onSubmit={handleSend}>
-          <input
-            type="text"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder="Digite sua mensagem ou comando (/comando)..."
-          />
-          <Button variant="primary" type="submit">Enviar</Button>
-        </form>
+        <div className={styles.inputArea}>
+          {commandSuggestions.length > 0 && (
+            <div className={styles.commandList}>
+              {commandSuggestions.map(c => (
+                <button
+                  type="button"
+                  key={c.name}
+                  className={styles.commandItem}
+                  onClick={() => setInput(c.name + ' ')}
+                >
+                  <span className={styles.commandName}>{c.usage}</span>
+                  <span className={styles.commandDesc}>{c.description}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          <form className={styles.inputForm} onSubmit={handleSend}>
+            <input
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={handleInputKeyDown}
+              placeholder="Digite sua mensagem ou comando (/comando)..."
+            />
+            <Button variant="primary" type="submit">Enviar</Button>
+          </form>
+        </div>
       </div>
 
       {showInfoModal && id && (
