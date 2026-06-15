@@ -134,6 +134,23 @@
   background-color: #f1f1f1;
 }
 
+.copied,
+.copied:hover {
+  background-color: #007900;
+  color: var(--color-text-light);
+  transition: background-color 0.2s;
+}
+
+.codeInputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.codeInputRow input {
+  flex: 1;
+}
+
 .dropdown:hover .dropdownContent {
   display: block;
 }

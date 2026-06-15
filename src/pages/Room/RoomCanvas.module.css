@@ -1,0 +1,173 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Fill the panel so the board (not the whole component) is the scroll area. */
+    flex: 1;
+    min-height: 0;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 12px;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    flex-shrink: 0; /* keep the toolbar pinned; only the board scrolls */
+}
+
+.toolGroup {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Hover label for the icon-only tool buttons */
+.tooltip {
+    position: relative;
+    display: inline-flex;
+}
+
+.tooltip::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #1f1f1f;
+    color: #fff;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    padding: 3px 7px;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease;
+    z-index: 20;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+}
+
+.palette {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 2px;
+    padding: 2px;
+    background-color: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+.swatch {
+    width: 18px;
+    height: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    padding: 0;
+}
+
+.swatch:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.swatchActive {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -1px;
+    z-index: 1;
+}
+
+.widthLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.ownerSettings {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-left: auto;
+}
+
+.betaToggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.sizeControl {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+}
+
+.sizeControl select {
+    padding: 3px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+.betaTag {
+    font-size: 0.65rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--color-text-light);
+    background-color: var(--color-warning, #f59e0b);
+    border-radius: var(--radius-sm);
+    padding: 1px 5px;
+}
+
+.notice {
+    margin: 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+}
+
+.stageContainer {
+    /* Scroll viewport: fills the remaining space and scrolls when the board is
+       larger than it. On touch, scrolling only happens with the Pan tool (the
+       Stage sets touch-action per-tool); the board itself sets its real size. */
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    background-color: var(--color-bg-page);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.board {
+    /* The board at its real (owner-set) pixel size, with the paper grid. Sized
+       inline to canvasWidth/Height so the grid lines up with the Stage. */
+    background-color: #ffffff;
+    background-image:
+        linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
+    background-size: 32px 32px;
+}
+
+@media (max-width: 640px) {
+    .toolbar {
+        gap: 10px;
+        padding: 8px;
+    }
+
+    /* On phones let the owner settings drop to their own full-width row instead
+       of being shoved to the right edge. */
+    .ownerSettings {
+        margin-left: 0;
+        width: 100%;
+    }
+}
