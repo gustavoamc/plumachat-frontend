@@ -18,9 +18,12 @@
 }
 
 .canvasContainer {
+    /* Host for RoomCanvas: give it the remaining height and let the board
+       handle its own scrolling (so the toolbar stays pinned). */
     flex: 1;
-    overflow: auto;
-    padding-right: 4px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .removedDiv {

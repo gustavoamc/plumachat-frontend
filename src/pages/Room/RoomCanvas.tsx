@@ -43,7 +43,10 @@ const COLORS = [
   '#efe4b0', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7',
 ];
 
-type Tool = 'pen' | 'move' | 'eraser';
+// 'pan' is a view-navigation tool (not a board edit): it hands touch back to the
+// browser so one-finger swipe scrolls the board on phones. It's the only tool
+// usable in read-only mode, since navigating isn't drawing.
+type Tool = 'pen' | 'move' | 'eraser' | 'pan';
 
 // A reversible board action by this client, used for local undo/redo. Each op
 // records what changed; undo/redo replay it via the normal socket events so
@@ -321,15 +324,16 @@ export function RoomCanvas({ roomId }: RoomCanvasProps) {
       <div className={styles.toolbar}>
         <div className={styles.toolGroup}>
           {([
-            { id: 'pen', icon: '✏️', label: 'Desenhar' },
-            { id: 'move', icon: '✋', label: 'Mover' },
-            { id: 'eraser', icon: '🧽', label: 'Apagar' },
+            { id: 'pen', icon: '✏️', label: 'Desenhar', requiresDraw: true },
+            { id: 'move', icon: '✋', label: 'Mover objeto', requiresDraw: true },
+            { id: 'eraser', icon: '🧽', label: 'Apagar', requiresDraw: true },
+            { id: 'pan', icon: '🧭', label: 'Navegar (arrastar tela)', requiresDraw: false },
           ] as const).map(t => (
             <span key={t.id} className={styles.tooltip} data-tip={t.label}>
               <Button
                 variant={tool === t.id ? 'primary' : 'neutral'}
                 onClick={() => setTool(t.id)}
-                disabled={!canDraw}
+                disabled={t.requiresDraw && !canDraw}
                 aria-label={t.label}
                 style={{ width: 40, height: 40, padding: 0, fontSize: '1.1rem' }}
               >
@@ -422,6 +426,7 @@ export function RoomCanvas({ roomId }: RoomCanvasProps) {
       )}
 
       <div className={styles.stageContainer}>
+        <div className={styles.board} style={{ width: canvasWidth, height: canvasHeight }}>
         <Stage
           ref={stageRef}
           width={canvasWidth}
@@ -433,7 +438,15 @@ export function RoomCanvas({ roomId }: RoomCanvasProps) {
           onMouseUp={handlePointerUp}
           onTouchEnd={handlePointerUp}
           onMouseLeave={handlePointerUp}
-          style={{ cursor: canDraw && tool === 'pen' ? 'crosshair' : 'default' }}
+          // With the Pan tool, hand touch back to the browser so a one-finger
+          // swipe scrolls the board natively; otherwise Konva owns touch and
+          // suppresses scrolling so drawing/dragging works.
+          preventDefault={tool !== 'pan'}
+          style={{
+            cursor:
+              tool === 'pan' ? 'grab' : canDraw && tool === 'pen' ? 'crosshair' : 'default',
+            touchAction: tool === 'pan' ? 'pan-x pan-y' : 'none',
+          }}
         >
           <Layer>
             {shapes.map(shape => (
@@ -472,6 +485,7 @@ export function RoomCanvas({ roomId }: RoomCanvasProps) {
             )}
           </Layer>
         </Stage>
+        </div>
       </div>
     </div>
   );
