@@ -444,6 +444,9 @@ export function RoomCanvas({ roomId }: RoomCanvasProps) {
                 y={shape.y}
                 stroke={shape.stroke}
                 strokeWidth={shape.strokeWidth}
+                // Widen only the invisible hit region so thin strokes are still
+                // easy to grab (move) or click (erase) with a fingertip on touch.
+                hitStrokeWidth={Math.max(shape.strokeWidth, 32)}
                 lineCap="round"
                 lineJoin="round"
                 tension={0.3}
