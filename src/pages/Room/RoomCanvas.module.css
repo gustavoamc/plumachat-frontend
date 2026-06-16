@@ -150,12 +150,40 @@
 
 .board {
     /* The board at its real (owner-set) pixel size, with the paper grid. Sized
-       inline to canvasWidth/Height so the grid lines up with the Stage. */
+       inline to canvasWidth/Height so the grid lines up with the Stage.
+       `relative` anchors the text-edit overlay to board coordinates. */
+    position: relative;
     background-color: #ffffff;
     background-image:
         linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
         linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
     background-size: 32px 32px;
+}
+
+/* Inline editor for the text tool, overlaid on the board at the shape's
+   logical position (the board has no scale, so x/y map straight to px). */
+.textEditor {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 1px dashed var(--color-primary);
+    background: rgba(255, 255, 255, 0.85);
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.1;
+    font-family: inherit;
+    min-width: 40px;
+    min-height: 1.2em;
+    z-index: 5;
+}
+
+.checkLabel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    white-space: nowrap;
 }
 
 @media (max-width: 640px) {
