@@ -4,6 +4,9 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
+  /* Auth screen sits on the dark backdrop; labels/headings go light. Inputs
+     keep their own (dark) text on their light fields. */
+  color: var(--color-text-light);
 }
 
 .inputs {

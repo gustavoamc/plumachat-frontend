@@ -1,5 +1,8 @@
 .wrapper {
   padding: 1rem;
+  /* Title + tabs sit on the dark backdrop; content sits on a dark panel. */
+  color: var(--color-text-light);
+  min-height: calc(100vh - var(--navbar-height));
 }
 
 .tabs {
@@ -9,18 +12,18 @@
 }
 
 .tabButton {
-  background-color: #eee;
+  background-color: var(--color-surface-raised);
   padding: 0.5rem 1rem;
   border: none;
   cursor: pointer;
   font-weight: bold;
   border-radius: 5px 5px 0 0;
-  color: var(--color-text);
+  color: var(--color-text-light);
   transition: background-color 0.2s ease;
 }
 
 .tabButton:hover {
-  background-color: var(--color-bg-input);
+  background-color: var(--color-border-ondark);
 }
 
 .active {
@@ -29,9 +32,10 @@
 }
 
 .tabContent {
-  background-color: var(--color-bg-subtle);
+  background-color: var(--color-surface);
+  color: var(--color-text-light);
   padding: 1rem;
   border-radius: 0 0 0.5rem 0.5rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-ondark);
   border-top: none;
 }

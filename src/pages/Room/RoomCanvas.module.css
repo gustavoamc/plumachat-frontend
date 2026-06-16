@@ -143,8 +143,9 @@
     flex: 1;
     min-height: 0;
     overflow: auto;
-    background-color: var(--color-bg-page);
-    border: 1px solid var(--color-border);
+    /* Dark surround so the white board stands out (matches the site backdrop). */
+    background-color: var(--color-bg-app);
+    border: 1px solid var(--color-border-dark);
     border-radius: var(--radius-md);
 }
 

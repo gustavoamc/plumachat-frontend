@@ -5,6 +5,8 @@
   align-items: stretch;
   height: calc(100vh - var(--navbar-height));
   gap: 1rem;
+  /* All landing copy sits on the dark backdrop (no light panels here). */
+  color: var(--color-text-light);
 }
 
 .mainColumnDiv {
@@ -75,4 +77,6 @@
     font-size: 3rem;
     font-weight: bold;
     margin-bottom: 1rem;
+    /* Landing title sits on the dark backdrop. */
+    color: var(--color-text-light);
 }

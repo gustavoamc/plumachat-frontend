@@ -9,8 +9,9 @@
 .leftColumn {
   width: 50%;
   padding: 2rem;
-  background-color: var(--color-bg-panel);
-  border-right: 2px solid var(--color-bg-input);
+  background-color: var(--color-surface);
+  color: var(--color-text-light);
+  border-right: 2px solid var(--color-border-ondark);
 }
 
 .rightColumn {
@@ -20,12 +21,13 @@
   gap: 1rem;
   padding: 2rem;
   box-sizing: border-box;
-  background-color: var(--color-bg-white);
+  background-color: var(--color-surface);
+  color: var(--color-text-light);
 }
 
 .infoBox {
-  background-color: var(--color-bg-card);
-  border: 2px solid var(--color-text-dark);
+  background-color: var(--color-surface-raised);
+  border: 2px solid var(--color-border-ondark);
   padding: 1.5rem;
   border-radius: var(--radius-lg);
   display: flex;
@@ -43,7 +45,8 @@
 
 .iconButtonDiv {
   padding: 0.5rem;
-  background-color: #f0f0f0;
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-light);
   border: none;
   border-radius: 0.25rem;
   cursor: pointer;
@@ -53,5 +56,5 @@
 }
 
 .iconButtonDiv:hover {
-  background-color: var(--color-bg-card);
+  background-color: var(--color-border-ondark);
 }

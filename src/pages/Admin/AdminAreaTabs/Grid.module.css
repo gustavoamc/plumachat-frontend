@@ -14,7 +14,9 @@
   padding: 0.5rem 1rem;
   font-size: 1rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-ondark);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-light);
 }
 
 .orderButtonsDiv {
@@ -32,15 +34,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-input);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-text-light);
+  border: 1px solid var(--color-border-ondark);
   padding: 0.5rem;
   cursor: pointer;
   border-radius: var(--radius-sm);
 }
 
 .sortButton:hover {
-  background: var(--color-bg-card);
+  background: var(--color-border-ondark);
 }
 
 .userList {
@@ -53,11 +56,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid var(--color-border-ondark);
 }
 
 .userItem:hover {
-  background-color: #acc;
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 
@@ -81,7 +84,7 @@
 }
 
 .leftColumn {
-  border-right: 2px solid var(--color-bg-input);
+  border-right: 2px solid var(--color-border-ondark);
   overflow-y: auto;
   padding: 1rem;
 }
@@ -91,7 +94,9 @@
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem;
-  background-color: var(--color-bg-page);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-light);
+  border-radius: var(--radius-sm);
 }
 
 .rightColumnHeader {
@@ -99,7 +104,7 @@
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
-  border: 1px solid var(--color-border-dark);
+  border: 1px solid var(--color-border-ondark);
   border-radius: var(--radius-sm);
   padding: 1rem;
 }

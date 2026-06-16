@@ -35,7 +35,7 @@ function Register() {
   }
 
   return (
-    <>
+    <div className={styles.login}>
       <h1>Crie uma conta para começar</h1>
       <br />
       <form onSubmit={handleRegister}>
@@ -56,7 +56,7 @@ function Register() {
         </div>
       </form>
       <p>Já tem uma conta ? <a href="/login">Faça login!</a></p>
-    </>
+    </div>
   )
 }
 
