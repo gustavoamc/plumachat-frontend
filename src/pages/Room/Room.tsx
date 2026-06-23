@@ -109,6 +109,26 @@ function Room() {
       setGame(state);
     });
 
+    // Lightweight in-chat feedback for game events (the panel shows live state).
+    const pushSystem = (content: string) => {
+      setMessages(prev => [...prev, {
+        _id: `gartic-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        system: true,
+        content,
+        timestamp: new Date().toISOString(),
+        userId: '',
+        username: '',
+      }]);
+    };
+
+    socket.on('gartic_correct', ({ username, points }: { username: string; points: number }) => {
+      pushSystem(`🎉 ${username} acertou a palavra! (+${points} pts)`);
+    });
+
+    socket.on('gartic_round_end', ({ word }: { word: string }) => {
+      pushSystem(`A palavra era: ${word}`);
+    });
+
     socket.on('system_message', (msg: ChatMessage) => {
       setMessages(prev => [...prev, msg]);
     });
@@ -144,6 +164,8 @@ function Room() {
       socket.emit('leave_room', id);
       socket.off('receive_message');
       socket.off('gartic_state');
+      socket.off('gartic_correct');
+      socket.off('gartic_round_end');
       socket.off('system_message');
       socket.off('presence');
       socket.off('participant_removed');

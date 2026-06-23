@@ -19,6 +19,16 @@
   margin: 0;
 }
 
+.winner {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.lobby .scoreboard {
+  width: 100%;
+  max-width: 320px;
+}
+
 .hud {
   display: flex;
   justify-content: space-between;

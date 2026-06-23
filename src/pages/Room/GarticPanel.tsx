@@ -106,6 +106,36 @@ export function GarticPanel({
     );
   }
 
+  // Final scoreboard.
+  if (game.phase === "results") {
+    const winner = game.players[0]; // server sends players sorted by score desc
+    return (
+      <div className={styles.panel}>
+        <div className={styles.lobby}>
+          <h3>🏁 Fim de jogo!</h3>
+          {winner && (
+            <p className={styles.winner}>
+              🏆 Vencedor: <strong>{winner.username}</strong> ({winner.score} pts)
+            </p>
+          )}
+          <Scoreboard
+            players={game.players}
+            guessed={[]}
+            drawerId={null}
+            currentUserId={currentUserId}
+          />
+          {isOwner ? (
+            <Button variant="success" onClick={onStart}>
+              Jogar novamente
+            </Button>
+          ) : (
+            <p>Aguardando o dono iniciar uma nova partida…</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const submitGuess = (e: React.FormEvent) => {
     e.preventDefault();
     const text = guess.trim();
