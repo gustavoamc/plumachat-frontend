@@ -3,6 +3,7 @@ import { useState } from "react";
 import styles from "./AdminArea.module.css";
 import UsersList from "./AdminAreaTabs/UsersList";
 import AdminPromote from "./AdminAreaTabs/AdminPromote";
+import InviteKeys from "./AdminAreaTabs/InviteKeys";
 import { ErrorBoundary } from "../../components/routes/ErrorBoundary";
 
 export default function AdminArea() {
@@ -31,6 +32,13 @@ export default function AdminArea() {
             Gerenciar Admins
           </button>
         )}
+
+        <button
+          className={`${styles.tabButton} ${activeTab === "invites" ? styles.active : ""}`}
+          onClick={() => setActiveTab("invites")}
+        >
+          Chaves de Convite
+        </button>
       </div>
 
       <div className={styles.tabContent}>
@@ -39,9 +47,14 @@ export default function AdminArea() {
             <UsersList />
           </ErrorBoundary>
         }
-        {activeTab === "promote" && isRoot && 
+        {activeTab === "promote" && isRoot &&
           <ErrorBoundary>
-            <AdminPromote />  
+            <AdminPromote />
+          </ErrorBoundary>
+        }
+        {activeTab === "invites" &&
+          <ErrorBoundary>
+            <InviteKeys />
           </ErrorBoundary>
         }
       </div>

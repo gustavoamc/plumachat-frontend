@@ -10,7 +10,8 @@ function Register() {
   const [registerInfo, setRegisterInfo] = useState({
     username: '',
     email: '',
-    password: ''
+    password: '',
+    inviteCode: ''
   })
 
   function handleChange(e: any) {
@@ -30,7 +31,7 @@ function Register() {
       navigate('/dashboard', {replace: true})
     }).catch((error) => {
       console.log(error)
-      alert('Erro ao fazer login!')
+      alert(error?.response?.data?.message || 'Erro ao criar conta!')
     })
   }
 
@@ -50,6 +51,10 @@ function Register() {
         <div className={styles.inputs}>
           <label htmlFor="password">Senha:</label>
           <input type="password" name="password" id="password" onChange={handleChange} />
+        </div>
+        <div className={styles.inputs}>
+          <label htmlFor="inviteCode">Chave de convite:</label>
+          <input type="text" name="inviteCode" id="inviteCode" onChange={handleChange} />
         </div>
         <div className={styles.inputs}>
           <button type='submit'>Criar Conta</button>
