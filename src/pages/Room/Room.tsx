@@ -9,12 +9,15 @@ import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { RoomInfoPanel } from './RoomInfoPanel';
 import { RoomCanvas } from './RoomCanvas';
+import { GarticPanel, type GarticState } from './GarticPanel';
 import { FaArrowLeft, FaPaintBrush, FaComments } from "react-icons/fa";
 
 interface RoomMeta {
   _id: string;
   name: string;
   isPrivate: boolean;
+  roomType?: 'default' | 'draw_guess';
+  owner?: { _id: string; username: string } | string;
   participants: { _id: string; username: string }[];
 }
 
@@ -44,6 +47,7 @@ function Room() {
   const [removed, setRemoved] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
+  const [game, setGame] = useState<GarticState | null>(null);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [showSystemMessages, setShowSystemMessages] = useState(
     () => localStorage.getItem('showSystemMessages') !== 'false'
@@ -94,9 +98,15 @@ function Room() {
     const socket = getSocket();
     socket.connect();
     socket.emit('join_room', id);
+    // Rehydrate any in-progress draw_guess game (no-op for normal rooms).
+    socket.emit('gartic_request_state', id);
 
     socket.on('receive_message', (msg: ChatMessage) => {
       setMessages(prev => [...prev, msg]);
+    });
+
+    socket.on('gartic_state', (state: GarticState) => {
+      setGame(state);
     });
 
     socket.on('system_message', (msg: ChatMessage) => {
@@ -133,6 +143,7 @@ function Room() {
     return () => {
       socket.emit('leave_room', id);
       socket.off('receive_message');
+      socket.off('gartic_state');
       socket.off('system_message');
       socket.off('presence');
       socket.off('participant_removed');
@@ -145,6 +156,31 @@ function Room() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  const isGameRoom = room?.roomType === 'draw_guess';
+  const ownerId = typeof room?.owner === 'string' ? room?.owner : room?.owner?._id;
+  const isGameOwner = !!ownerId && ownerId === user?._id;
+  const gameActive = !!game && (game.phase === 'drawing' || game.phase === 'reveal');
+
+  // While a round is live the canvas is locked to the current drawer; during the
+  // reveal nobody draws. Outside those phases, normal room rules apply.
+  const canDrawOverride =
+    game && game.phase === 'drawing' ? game.youAreDrawer
+    : game && game.phase === 'reveal' ? false
+    : undefined;
+
+  // During an active game the board *is* the game, so keep it visible.
+  useEffect(() => {
+    if (gameActive) setShowCanvas(true);
+  }, [gameActive]);
+
+  const handleStartGame = () => {
+    if (id) getSocket().emit('gartic_start', id);
+  };
+
+  const handleGuess = (text: string) => {
+    if (id) getSocket().emit('send_message', { roomId: id, content: text });
+  };
 
   // Formats a timestamp as "DD/MM/YY HH:MM:SS"
   const formatSystemTime = (ts: string) => {
@@ -224,9 +260,19 @@ function Room() {
           </div>
         </div>
 
+        {isGameRoom && user && (
+          <GarticPanel
+            game={game}
+            isOwner={isGameOwner}
+            currentUserId={user._id}
+            onStart={handleStartGame}
+            onGuess={handleGuess}
+          />
+        )}
+
         {showCanvas && id && (
           <div className={styles.canvasContainer}>
-            <RoomCanvas roomId={id} />
+            <RoomCanvas roomId={id} canDrawOverride={canDrawOverride} />
           </div>
         )}
 

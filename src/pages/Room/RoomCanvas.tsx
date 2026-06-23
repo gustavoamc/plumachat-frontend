@@ -114,6 +114,10 @@ type Op =
 
 interface RoomCanvasProps {
   roomId: string;
+  // When set, overrides the room's owner-only draw rule. Used by the draw_guess
+  // game mode to lock drawing to the current drawer (true) / everyone else
+  // (false). Leave undefined for normal rooms.
+  canDrawOverride?: boolean;
 }
 
 // Loads an image URL into a Konva.Image node. One component per image so the
@@ -167,7 +171,7 @@ function URLImage({
   );
 }
 
-export function RoomCanvas({ roomId }: RoomCanvasProps) {
+export function RoomCanvas({ roomId, canDrawOverride }: RoomCanvasProps) {
   const [shapes, setShapes] = useState<DrawShape[]>([]);
   const [draft, setDraft] = useState<DrawShape | null>(null);
   const [tool, setTool] = useState<Tool>('pen');
@@ -202,7 +206,8 @@ export function RoomCanvas({ roomId }: RoomCanvasProps) {
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const lastMoveEmitRef = useRef(0);
 
-  const canDraw = !drawingOwnerOnly || isOwner;
+  const canDraw =
+    canDrawOverride !== undefined ? canDrawOverride : !drawingOwnerOnly || isOwner;
 
   // --- Socket wiring: request current state and listen for remote updates ---
   useEffect(() => {
