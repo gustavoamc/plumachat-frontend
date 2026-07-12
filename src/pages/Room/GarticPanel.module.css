@@ -1,0 +1,116 @@
+.panel {
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border-ondark);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-text-light);
+}
+
+.lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.lobby h3 {
+  margin: 0;
+}
+
+.winner {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.lobby .scoreboard {
+  width: 100%;
+  max-width: 320px;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.round {
+  font-weight: bold;
+}
+
+.timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+}
+
+.drawer {
+  font-style: italic;
+}
+
+.wordRow {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.word {
+  font-size: 1.15rem;
+}
+
+.wordMask {
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  font-family: monospace;
+}
+
+.wordMask em {
+  font-size: 0.85rem;
+  letter-spacing: normal;
+  opacity: 0.7;
+}
+
+.guessForm {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.guessForm input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-ondark);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-light);
+}
+
+.scoreboard {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.scoreRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.scoreRow.you {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.scoreName {
+  font-weight: 500;
+}
+
+.scoreValue {
+  font-variant-numeric: tabular-nums;
+  font-weight: bold;
+}

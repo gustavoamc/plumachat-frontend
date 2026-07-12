@@ -11,10 +11,18 @@ import { ErrorBoundary } from "../../components/routes/ErrorBoundary";
 import { Modal, modalStyles } from "../../components/ui/Modal";
 import { Button } from "../../components/ui/Button";
 
+type RoomType = "default" | "draw_guess";
+
+const ROOM_TYPE_LABELS: Record<RoomType, string> = {
+  default: "Chat com canvas",
+  draw_guess: "Desenhe e adivinhe",
+};
+
 interface Room {
   _id: string;
   name: string;
   isPrivate: boolean;
+  roomType: RoomType;
   owner: string;
 }
 
@@ -24,7 +32,7 @@ export default function Dashboard() {
   const [roomCode, setRoomCode] = useState("");
   const [showFindRoomModal, setShowFindRoomModal] = useState(false);
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
-  const [room, setRoom] = useState({name: '', isPrivate: true});
+  const [room, setRoom] = useState<{ name: string; isPrivate: boolean; roomType: RoomType }>({ name: '', isPrivate: true, roomType: 'default' });
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -132,7 +140,10 @@ export default function Dashboard() {
             : <ul>
                 {userRooms.map(room => (
                   <li key={room._id} className={styles.roomRow}>
-                    <p><span>{room.name}</span> {room.isPrivate ? "(Privada)" : "(Pública)"}</p>
+                    <p>
+                      <span>{room.name}</span> {room.isPrivate ? "(Privada)" : "(Pública)"}
+                      {room.roomType === "draw_guess" && ` · ${ROOM_TYPE_LABELS.draw_guess}`}
+                    </p>
                     <div className={styles.roomRowButtons}>
                       <Link to={`/room/${room._id}`} className={styles.joinButton}>Entrar <FaDoorOpen/></Link>
                       <div className={styles.dropdown}>
@@ -185,6 +196,11 @@ export default function Dashboard() {
           <form onSubmit={handleCreateRoom}>
             <label>Nome da sala:</label>
             <input type="text" required name='name' onChange={handleRoomChange}/>
+            <label>Tipo de sala:</label>
+            <select name='roomType' value={room.roomType} onChange={handleRoomChange}>
+              <option value="default">{ROOM_TYPE_LABELS.default}</option>
+              <option value="draw_guess">{ROOM_TYPE_LABELS.draw_guess}</option>
+            </select>
             <div className={modalStyles.actions}>
               <Button variant="danger" type="button" onClick={() => setShowCreateRoomModal(false)}>Cancelar</Button>
               <Button variant="success" type="submit">Criar</Button>
