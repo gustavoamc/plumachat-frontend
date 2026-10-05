@@ -47,7 +47,8 @@ function UsersList() {
       .then(res => {
         setUsers(res.data)
         setDefaultUsers(res.data)
-        setSelectedUser(res.data[0])
+        // The list can be empty (e.g. a fresh install with only root).
+        setSelectedUser(res.data[0] ?? defaultUser)
       })
       .catch(((error) => {
         console.log("Erro: " + error)
