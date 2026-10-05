@@ -280,13 +280,14 @@ export function RoomCanvas({ roomId, canDrawOverride }: RoomCanvasProps) {
     if (!tr) return;
     const shape = shapes.find(s => s.id === selectedId);
     const node = selectedId ? shapeRefs.current.get(selectedId) : undefined;
-    if (tool === 'move' && node && shape && RESIZABLE.has(shape.type)) {
+    // No handles without draw permission: the server would reject the change.
+    if (canDraw && tool === 'move' && node && shape && RESIZABLE.has(shape.type)) {
       tr.nodes([node]);
     } else {
       tr.nodes([]);
     }
     tr.getLayer()?.batchDraw();
-  }, [selectedId, tool, shapes]);
+  }, [selectedId, tool, shapes, canDraw]);
 
   // Leaving select mode clears the selection / Transformer.
   useEffect(() => {
@@ -776,8 +777,8 @@ export function RoomCanvas({ roomId, canDrawOverride }: RoomCanvasProps) {
             width={shape.width}
             visible={editing?.id !== shape.id}
             draggable={draggable}
-            onDblClick={interactive ? () => startEditText(shape) : undefined}
-            onDblTap={interactive ? () => startEditText(shape) : undefined}
+            onDblClick={interactive && canDraw ? () => startEditText(shape) : undefined}
+            onDblTap={interactive && canDraw ? () => startEditText(shape) : undefined}
             {...handlers}
           />
         );
