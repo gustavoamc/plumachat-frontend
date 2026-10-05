@@ -86,6 +86,9 @@ const CANVAS_SIZES = [
 ];
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // keep in sync with the backend limit
+// Max flat numbers per stroke the server keeps (MAX_POINTS in drawing.ts).
+// Longer strokes are split into several so nothing gets truncated for others.
+const MAX_STROKE_POINTS = 2000;
 const IMPORT_MAX_DIM = 480; // imported images are scaled to fit within this box
 
 // Throttle live drag emissions: at most one socket message per this interval to
@@ -107,6 +110,7 @@ type Tool = 'pen' | 'rect' | 'ellipse' | 'arrow' | 'text' | 'image' | 'move' | '
 // client stays in sync.
 type Op =
   | { type: 'add'; shape: DrawShape }
+  | { type: 'addMany'; shapes: DrawShape[] } // one long stroke split in chunks
   | { type: 'remove'; shape: DrawShape }
   | { type: 'move'; id: string; from: { x: number; y: number }; to: { x: number; y: number } }
   | { type: 'update'; before: DrawShape; after: DrawShape }
@@ -351,6 +355,7 @@ export function RoomCanvas({ roomId, canDrawOverride }: RoomCanvasProps) {
     const op = undoStack[undoStack.length - 1];
     switch (op.type) {
       case 'add': emitRemove(op.shape.id); break;
+      case 'addMany': op.shapes.forEach(s => emitRemove(s.id)); break;
       case 'remove': emitAdd(op.shape); break;
       case 'move': emitMove(op.id, op.from.x, op.from.y); break;
       case 'update': emitUpdate(op.before); break;
@@ -365,6 +370,7 @@ export function RoomCanvas({ roomId, canDrawOverride }: RoomCanvasProps) {
     const op = redoStack[redoStack.length - 1];
     switch (op.type) {
       case 'add': emitAdd(op.shape); break;
+      case 'addMany': restoreShapes(op.shapes); break;
       case 'remove': emitRemove(op.shape.id); break;
       case 'move': emitMove(op.id, op.to.x, op.to.y); break;
       case 'update': emitUpdate(op.after); break;
@@ -443,6 +449,22 @@ export function RoomCanvas({ roomId, canDrawOverride }: RoomCanvasProps) {
     if (d.type === 'arrow') {
       const [x1, y1, x2, y2] = d.points;
       if (Math.hypot(x2 - x1, y2 - y1) < 3) return;
+    }
+    if (d.type === 'line' && d.points.length > MAX_STROKE_POINTS) {
+      // Split into chunks the server accepts whole; each chunk starts at the
+      // previous one's last point so the stroke stays continuous.
+      const chunks: LineShape[] = [];
+      for (let i = 0; i < d.points.length - 2; i += MAX_STROKE_POINTS - 2) {
+        chunks.push({
+          ...d,
+          id: chunks.length === 0 ? d.id : newId(),
+          points: d.points.slice(i, i + MAX_STROKE_POINTS),
+        });
+      }
+      setShapes(prev => [...prev, ...chunks]);
+      chunks.forEach(shape => getSocket().emit('draw_add', { roomId, shape }));
+      pushOp({ type: 'addMany', shapes: chunks });
+      return;
     }
     setShapes(prev => [...prev, d]);
     getSocket().emit('draw_add', { roomId, shape: d });
