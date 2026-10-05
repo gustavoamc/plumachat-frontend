@@ -34,9 +34,11 @@ export default function AdminPromote() {
   const handleSearch = (e: any) => {
     const { name, value } = e.target;
     if (name === 'search' && value !== ''){
-      setUsers(users.filter(user => 
+      // Filter the full list, not the current (already filtered) one, so
+      // deleting characters widens the results again.
+      setUsers(defaultUsers.filter(user =>
         user.username.toLowerCase().includes(value.toLowerCase()) ||
-        user.email.includes(value)
+        user.email.toLowerCase().includes(value.toLowerCase())
       )
     );
     } else {
@@ -80,10 +82,12 @@ export default function AdminPromote() {
         );
         break;
       case 'role':
+        // Admins first, then users; alphabetical within each role.
         setUsers(
-          [...users].sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          [...users].sort((a, b) =>
+            a.role === b.role
+              ? a.username.toLowerCase().localeCompare(b.username.toLowerCase())
+              : a.role === 'admin' ? -1 : 1
           )
         );
         break;
