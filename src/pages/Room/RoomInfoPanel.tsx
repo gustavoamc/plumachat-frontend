@@ -25,9 +25,11 @@ interface RoomInfoPanelProps {
   // System-message visibility toggle; omit when there's no chat (e.g. the page route)
   showSystemMessages?: boolean;
   onToggleSystemMessages?: () => void;
+  // Called after the room is edited, so a parent showing room data can refresh.
+  onRoomUpdated?: () => void;
 }
 
-export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, onToggleSystemMessages }: RoomInfoPanelProps) {
+export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, onToggleSystemMessages, onRoomUpdated }: RoomInfoPanelProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showEditRoomModal, setShowEditRoomModal] = useState(false);
@@ -79,6 +81,7 @@ export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, 
       .then(res => {
         setRoom(res.data.room);
         setShowEditRoomModal(false);
+        onRoomUpdated?.();
       })
       .catch(error => {
         alert('Erro ao editar sala: ' + (error.response?.data?.message ?? 'erro'));
