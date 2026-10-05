@@ -248,7 +248,13 @@ export function RoomCanvas({ roomId, canDrawOverride }: RoomCanvasProps) {
     const onRemove = ({ id }: { id: string }) => {
       setShapes(prev => prev.filter(s => s.id !== id));
     };
-    const onClear = () => setShapes([]);
+    const onClear = () => {
+      setShapes([]);
+      // A remote clear (incl. a new draw_guess round) invalidates local history;
+      // replaying it would resurrect shapes from the previous board.
+      setUndoStack([]);
+      setRedoStack([]);
+    };
     const onSettings = (data: { drawingOwnerOnly: boolean; canvasWidth?: number; canvasHeight?: number }) => {
       setDrawingOwnerOnly(!!data.drawingOwnerOnly);
       if (data.canvasWidth) setCanvasWidth(data.canvasWidth);
