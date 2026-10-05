@@ -67,7 +67,7 @@ function UsersList() {
       setSelectedUser(prev => ({...prev, isBanned: true, banReason, banUntil}))
       setOpenBanModal(false);
     }).catch((error) => {
-      alert('Erro: ' + error.message)
+      alert('Erro: ' + (error.response?.data?.message ?? error.message))
     })
   }
 
@@ -88,7 +88,7 @@ function UsersList() {
       setBanReason('');
       setBanUntil('');
     }).catch((error) => {
-      alert('Erro: ' + error.message)
+      alert('Erro: ' + (error.response?.data?.message ?? error.message))
     })
   }
 

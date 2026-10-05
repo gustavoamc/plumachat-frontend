@@ -65,7 +65,7 @@ export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, 
       }));
     })
     .catch(error => {
-      console.error("Erro ao remover participante:", error);
+      alert('Erro ao remover participante: ' + (error.response?.data?.message ?? 'erro'));
     })
   }
 
@@ -83,7 +83,7 @@ export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, 
         setShowEditRoomModal(false);
       })
       .catch(error => {
-        alert('Erro ao editar sala: ' + error.response.data.message);
+        alert('Erro ao editar sala: ' + (error.response?.data?.message ?? 'erro'));
       })
   }
 

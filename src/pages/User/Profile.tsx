@@ -43,7 +43,7 @@ function Profile() { //TODO: move modals to a modal component
       setPasswords({currentPassword: '', newPassword: '', confirmPassword: ''});
       //TODO disable old tokens
     }).catch(error => {
-      alert(error.response.data.message || 'Erro ao alterar senha');
+      alert(error.response?.data?.message || 'Erro ao alterar senha');
       return;
     })
   };
@@ -65,7 +65,7 @@ function Profile() { //TODO: move modals to a modal component
       user!.email = email;
       login(localStorage.getItem('token') || '', user!);
     }).catch((error) => {
-      alert(error.response.data.message || 'Erro ao alterar dados');
+      alert(error.response?.data?.message || 'Erro ao alterar dados');
       return;
     })
   }

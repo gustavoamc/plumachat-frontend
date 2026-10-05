@@ -112,7 +112,7 @@ export default function AdminPromote() {
         setDefaultUsers(prev => prev.map(user => user._id === id ? { ...user, role: "admin" } : user));
       })
       .catch((error) => {
-        alert(error)
+        alert(error.response?.data?.message ?? error.message)
         console.log('Erro: ' + error);
       })
   };
@@ -131,7 +131,7 @@ export default function AdminPromote() {
         setDefaultUsers(prev => prev.map(user => user._id === id ? { ...user, role: "user" } : user));
       })
       .catch((error) => {
-        alert(error);
+        alert(error.response?.data?.message ?? error.message);
         console.log('Erro: ' + error);
       })
   };
