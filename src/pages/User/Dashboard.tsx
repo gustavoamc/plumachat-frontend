@@ -56,10 +56,10 @@ export default function Dashboard() {
     api.post('/room/', room)
       .then(res => {
         setShowCreateRoomModal(false);
-        setUserRooms([...userRooms, res.data.room]);
+        setUserRooms(prev => [...prev, res.data.room]);
       })
       .catch(error => {
-        console.error("Erro ao criar sala:", error);
+        alert("Erro ao criar sala: " + (error.response?.data?.message ?? "erro"));
       });
   }
 
@@ -114,7 +114,7 @@ export default function Dashboard() {
       })
       .catch(error => {
         console.error("Erro ao procurar sala:", error);
-        alert("Erro ao procurar sala. " + error.response.data.message);
+        alert("Erro ao procurar sala. " + (error.response?.data?.message ?? ""));
       });
   }
 

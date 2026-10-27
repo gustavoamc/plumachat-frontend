@@ -25,12 +25,17 @@ interface RoomInfoPanelProps {
   // System-message visibility toggle; omit when there's no chat (e.g. the page route)
   showSystemMessages?: boolean;
   onToggleSystemMessages?: () => void;
+  // Called after the room is edited, so a parent showing room data can refresh.
+  onRoomUpdated?: () => void;
 }
 
-export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, onToggleSystemMessages }: RoomInfoPanelProps) {
+export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, onToggleSystemMessages, onRoomUpdated }: RoomInfoPanelProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showEditRoomModal, setShowEditRoomModal] = useState(false);
+  // Draft name for the edit modal, kept apart from `room` so the displayed
+  // name doesn't change while typing (or after cancelling).
+  const [editName, setEditName] = useState('');
   const [isOnwer, setIsOwner] = useState(false);
   const [room, setRoom] = useState<Room>({
     _id: id,
@@ -65,25 +70,21 @@ export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, 
       }));
     })
     .catch(error => {
-      console.error("Erro ao remover participante:", error);
+      alert('Erro ao remover participante: ' + (error.response?.data?.message ?? 'erro'));
     })
   }
 
-  const handleRoomChange = (e: any) => {
-    const { name, value } = e.target;
-    setRoom(prevState => ({ ...prevState, [name]: value }));
-  }
-
-  const handleEditRoom = (e: any) => {
+  const handleEditRoom = (e: React.FormEvent) => {
     e.preventDefault();
 
-    api.patch(`/room/${id}`, { name: room.name })
+    api.patch(`/room/${id}`, { name: editName })
       .then(res => {
         setRoom(res.data.room);
         setShowEditRoomModal(false);
+        onRoomUpdated?.();
       })
       .catch(error => {
-        alert('Erro ao editar sala: ' + error.response.data.message);
+        alert('Erro ao editar sala: ' + (error.response?.data?.message ?? 'erro'));
       })
   }
 
@@ -140,7 +141,7 @@ export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, 
                     )}
                     {user!._id == participant._id ? <strong> (Você)</strong>: ''}
                   </p>
-                  {isOnwer && (
+                  {isOnwer && participant._id !== room.owner._id && (
                     <Button variant="danger" onClick={() => removeParticipant(participant._id)}><IoIosRemoveCircle /> Remover da sala</Button>
                   )}
                 </div>
@@ -159,10 +160,13 @@ export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, 
                     : <><FaEye /> Mostrar mensagens de sistema</>}
                 </Button>
               )}
-              <Button variant="danger" onClick={handleLeaveRoom}><IoMdExit /> Sair da sala</Button>
+              {/* The owner can't leave their own room; they delete it instead. */}
+              {!isOnwer && (
+                <Button variant="danger" onClick={handleLeaveRoom}><IoMdExit /> Sair da sala</Button>
+              )}
               {isOnwer && (
                 <>
-                  <Button variant="warning" onClick={() => setShowEditRoomModal(true)}>
+                  <Button variant="warning" onClick={() => { setEditName(room.name); setShowEditRoomModal(true); }}>
                     <FaEdit /> Editar sala
                   </Button>
                   <Button variant="danger" onClick={handleDeleteRoom}><FaTrashAlt /> Deletar sala</Button>
@@ -182,7 +186,7 @@ export function RoomInfoPanel({ id, onClose, onlineUserIds, showSystemMessages, 
           <h2>Editar sala</h2>
           <form onSubmit={handleEditRoom}>
             <label>Novo nome da sala:</label>
-            <input type="text" required name='name' onChange={handleRoomChange}/>
+            <input type="text" required name='name' value={editName} onChange={e => setEditName(e.target.value)}/>
             <div className={modalStyles.actions}>
               <Button variant="danger" type="button" onClick={() => setShowEditRoomModal(false)}>Cancelar</Button>
               <Button variant="success" type="submit">Alterar</Button>

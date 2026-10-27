@@ -43,7 +43,7 @@ function Profile() { //TODO: move modals to a modal component
       setPasswords({currentPassword: '', newPassword: '', confirmPassword: ''});
       //TODO disable old tokens
     }).catch(error => {
-      alert(error.response.data.message || 'Erro ao alterar senha');
+      alert(error.response?.data?.message || 'Erro ao alterar senha');
       return;
     })
   };
@@ -60,12 +60,10 @@ function Profile() { //TODO: move modals to a modal component
       setShowDataModal(false);
       setData({username: '', email: ''});
 
-      //update user state
-      user!.username = username;
-      user!.email = email;
-      login(localStorage.getItem('token') || '', user!);
+      // update user state (new object, so React sees the change)
+      login(localStorage.getItem('token') || '', { ...user!, username, email });
     }).catch((error) => {
-      alert(error.response.data.message || 'Erro ao alterar dados');
+      alert(error.response?.data?.message || 'Erro ao alterar dados');
       return;
     })
   }

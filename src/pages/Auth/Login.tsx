@@ -33,7 +33,7 @@ function Login() {
       navigate('/dashboard', {replace: true})
     }).catch((error) => {
       console.log(error)
-      alert('Erro ao fazer login! \n' + error.response.data.message)
+      alert('Erro ao fazer login! \n' + (error.response?.data?.message ?? 'Servidor indisponível.'))
     })
   }
 

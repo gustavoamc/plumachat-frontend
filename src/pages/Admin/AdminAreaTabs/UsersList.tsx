@@ -47,7 +47,8 @@ function UsersList() {
       .then(res => {
         setUsers(res.data)
         setDefaultUsers(res.data)
-        setSelectedUser(res.data[0])
+        // The list can be empty (e.g. a fresh install with only root).
+        setSelectedUser(res.data[0] ?? defaultUser)
       })
       .catch(((error) => {
         console.log("Erro: " + error)
@@ -67,7 +68,7 @@ function UsersList() {
       setSelectedUser(prev => ({...prev, isBanned: true, banReason, banUntil}))
       setOpenBanModal(false);
     }).catch((error) => {
-      alert('Erro: ' + error.message)
+      alert('Erro: ' + (error.response?.data?.message ?? error.message))
     })
   }
 
@@ -88,16 +89,18 @@ function UsersList() {
       setBanReason('');
       setBanUntil('');
     }).catch((error) => {
-      alert('Erro: ' + error.message)
+      alert('Erro: ' + (error.response?.data?.message ?? error.message))
     })
   }
 
   const handleSearch = (e: any) => {
     const { name, value } = e.target;
     if (name === 'search' && value !== ''){
-      setUsers(users.filter(user => 
+      // Filter the full list, not the current (already filtered) one, so
+      // deleting characters widens the results again.
+      setUsers(defaultUsers.filter(user =>
         user.username.toLowerCase().includes(value.toLowerCase()) ||
-        user.email.includes(value)
+        user.email.toLowerCase().includes(value.toLowerCase())
       )
     );
     } else {
@@ -141,10 +144,12 @@ function UsersList() {
         );
         break;
       case 'role':
+        // Admins first, then users; alphabetical within each role.
         setUsers(
-          [...users].sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          [...users].sort((a, b) =>
+            a.role === b.role
+              ? a.username.toLowerCase().localeCompare(b.username.toLowerCase())
+              : a.role === 'admin' ? -1 : 1
           )
         );
         break;

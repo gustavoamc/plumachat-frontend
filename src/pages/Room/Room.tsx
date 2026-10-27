@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../utils/api';
@@ -44,7 +44,8 @@ function Room() {
   const [room, setRoom] = useState<RoomMeta | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [removed, setRemoved] = useState(false);
+  // Why this client was kicked out of the room, if it was.
+  const [removed, setRemoved] = useState<'removed' | 'deleted' | null>(null);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showCanvas, setShowCanvas] = useState(false);
   const [game, setGame] = useState<GarticState | null>(null);
@@ -53,21 +54,36 @@ function Room() {
     () => localStorage.getItem('showSystemMessages') !== 'false'
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Load room metadata + message history
+  // Participant ids for the socket handlers (which don't re-subscribe on room
+  // changes). null until the room has loaded.
+  const participantIdsRef = useRef<Set<string> | null>(null);
   useEffect(() => {
-    if (!id) return;
+    participantIdsRef.current = room ? new Set(room.participants.map(p => p._id)) : null;
+  }, [room]);
 
+  const fetchRoom = useCallback(() => {
+    if (!id) return;
     api.get(`/room/${id}`)
       .then(res => setRoom(res.data))
       .catch(error => {
         alert('Erro ao buscar sala: ' + error.response?.data?.message);
         navigate(-1);
       });
+  }, [id, navigate]);
+  // Socket handlers call this through a ref so the connection effect doesn't
+  // depend on it (re-running it would reconnect and spam join/leave notices).
+  const fetchRoomRef = useRef(fetchRoom);
+  useEffect(() => { fetchRoomRef.current = fetchRoom; }, [fetchRoom]);
+
+  // Load room metadata + message history
+  useEffect(() => {
+    if (!id) return;
+
+    fetchRoom();
 
     api.get(`/room/${id}/messages`)
       .then(res => {
-        setMessages(res.data.map((m: any) => (
+        const history: ChatMessage[] = res.data.map((m: any) => (
           m.system
             ? {
                 _id: m._id,
@@ -84,22 +100,58 @@ function Room() {
                 content: m.content,
                 timestamp: m.timestamp,
               }
-        )));
+        ));
+        // Merge rather than replace: live messages may have arrived while the
+        // history request was in flight, and some may be in both lists.
+        setMessages(prev => {
+          const seen = new Set(history.map(m => m._id));
+          return [...history, ...prev.filter(m => !seen.has(m._id))];
+        });
       })
       .catch(error => {
         alert('Erro ao buscar mensagens: ' + error.response?.data?.message);
       });
-  }, [id]);
+  }, [id, fetchRoom]);
 
   // Socket connection lifecycle
   useEffect(() => {
     if (!id) return;
 
     const socket = getSocket();
+
+    // Appends a client-only notice (server errors, game events) to the chat.
+    const pushLocal = (content: string) => {
+      setMessages(prev => [...prev, {
+        _id: `local-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        system: true,
+        content,
+        timestamp: new Date().toISOString(),
+        userId: '',
+        username: '',
+      }]);
+    };
+
+    // Room membership is per connection, so (re)join on every connect — the
+    // first one and any automatic reconnect after a network blip.
+    let connErrorShown = false;
+    const onConnect = () => {
+      connErrorShown = false;
+      socket.emit('join_room', id);
+      // Rehydrate any in-progress draw_guess game (no-op for normal rooms).
+      socket.emit('gartic_request_state', id);
+    };
+    socket.on('connect', onConnect);
+
+    // Shown once per outage (reconnect attempts fire this repeatedly).
+    socket.on('connect_error', (err: Error) => {
+      if (connErrorShown) return;
+      connErrorShown = true;
+      pushLocal(`Falha na conexão com o chat: ${err.message}`);
+    });
+
     socket.connect();
-    socket.emit('join_room', id);
-    // Rehydrate any in-progress draw_guess game (no-op for normal rooms).
-    socket.emit('gartic_request_state', id);
+
+    socket.on('room_deleted', () => setRemoved('deleted'));
 
     socket.on('receive_message', (msg: ChatMessage) => {
       setMessages(prev => [...prev, msg]);
@@ -110,23 +162,12 @@ function Room() {
     });
 
     // Lightweight in-chat feedback for game events (the panel shows live state).
-    const pushSystem = (content: string) => {
-      setMessages(prev => [...prev, {
-        _id: `gartic-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        system: true,
-        content,
-        timestamp: new Date().toISOString(),
-        userId: '',
-        username: '',
-      }]);
-    };
-
     socket.on('gartic_correct', ({ username, points }: { username: string; points: number }) => {
-      pushSystem(`🎉 ${username} acertou a palavra! (+${points} pts)`);
+      pushLocal(`🎉 ${username} acertou a palavra! (+${points} pts)`);
     });
 
     socket.on('gartic_round_end', ({ word }: { word: string }) => {
-      pushSystem(`A palavra era: ${word}`);
+      pushLocal(`A palavra era: ${word}`);
     });
 
     socket.on('system_message', (msg: ChatMessage) => {
@@ -135,11 +176,18 @@ function Room() {
 
     socket.on('presence', ({ onlineUserIds }: { onlineUserIds: string[] }) => {
       setOnlineUserIds(onlineUserIds);
+      // Someone we don't know yet is online (they just joined the room):
+      // refresh the participant list so their messages aren't flagged as
+      // "saiu/removido".
+      const known = participantIdsRef.current;
+      if (known && onlineUserIds.some(uid => !known.has(uid))) {
+        fetchRoomRef.current();
+      }
     });
 
     socket.on('participant_removed', ({ userId }: { userId: string }) => {
       if (userId === user?._id) {
-        setRemoved(true);
+        setRemoved('removed');
         return;
       }
       // Drop the removed user from the local list so their messages are flagged
@@ -150,18 +198,14 @@ function Room() {
 
     socket.on('error', (err: { message: string }) => {
       // Show server feedback (e.g. invalid command) only to this client
-      setMessages(prev => [...prev, {
-        _id: `local-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        system: true,
-        content: err.message,
-        timestamp: new Date().toISOString(),
-        userId: '',
-        username: '',
-      }]);
+      pushLocal(err.message);
     });
 
     return () => {
       socket.emit('leave_room', id);
+      socket.off('connect', onConnect);
+      socket.off('connect_error');
+      socket.off('room_deleted');
       socket.off('receive_message');
       socket.off('gartic_state');
       socket.off('gartic_correct');
@@ -172,7 +216,7 @@ function Room() {
       socket.off('error');
       disconnectSocket();
     };
-  }, [id]);
+  }, [id, user?._id]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -254,8 +298,17 @@ function Room() {
     return (
       <ErrorBoundary>
         <div className={styles.removedDiv}>
-          <h1>Você foi removido desta sala.</h1>
-          <p>O dono da sala removeu seu acesso.</p>
+          {removed === 'deleted' ? (
+            <>
+              <h1>Esta sala foi deletada.</h1>
+              <p>A sala não existe mais.</p>
+            </>
+          ) : (
+            <>
+              <h1>Você foi removido desta sala.</h1>
+              <p>O dono da sala removeu seu acesso.</p>
+            </>
+          )}
           <Button variant="primary" onClick={() => navigate('/dashboard')}>
             <FaArrowLeft /> Voltar para a Dashboard
           </Button>
@@ -369,6 +422,7 @@ function Room() {
             onlineUserIds={onlineUserIds}
             showSystemMessages={showSystemMessages}
             onToggleSystemMessages={toggleSystemMessages}
+            onRoomUpdated={fetchRoom}
           />
         </Modal>
       )}
